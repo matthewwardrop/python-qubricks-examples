@@ -1,0 +1,31 @@
+This example is based on the paper:
+M. P. Wardrop and A. C. Doherty, "Exchange-based two-qubit gate for singlet-triplet qubits", PHYSICAL REVIEW B 90, 045418 (2014).
+This paper can also be found on the arXiv: http://arxiv.org/abs/1405.5274 .
+
+Usage
+-----
+
+On a system with python-qubricks and python-parameters installed, one can load the
+model in an interactive session using:
+-----
+$ ipython
+
+>>> from dqd import DQD
+>>> d = DQD('params.py')
+-----
+
+If you are interested in regenerating the plots in the above paper, change
+directory to the "plots" folder, and run:
+-----
+$ python2 fidelity.py <dim> <profile> <operators>
+-----
+where <dim> is some integer which will correspond to an nxn colour plot, <profile>
+is some valid profile such as "sinusoidal", and operators are any extra operators
+to add during runtime, such as "J_23_hf".
+
+If you want plots including psuedo-static noise, run:
+-----
+$ python2 fidelity_noise.py <dim> <profile> <operators>
+-----
+With the same synyax as before, but where profiles should be specified with the 
+addition of "_noisy"; for example "sinusoidal_noisy".

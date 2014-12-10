@@ -1,0 +1,7 @@
+This is the code for running the simulation described in the official QuBricks
+documentation.
+
+On a system with python-qubricks installed, you can run this code using:
+-----
+python2 twolevel.py
+-----

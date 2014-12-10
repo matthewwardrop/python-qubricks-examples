@@ -61,7 +61,7 @@ class DQD (QuantumSystem):
 
 		# J_23 noise
 		j1 = self.Operator( 0.25*(tensor(I,Z,Z,I) + tensor(I,X,X,I) + tensor(I,Y,Y,I) - tensor(I,I,I,I)) ).restrict(3,5,6,9,10,12)
-		self.add_derivative_op("J_24_hf", LindbladStateOperator(coefficient='D_23*N_23', operator=j1))
+		self.add_derivative_op("J_23_hf", LindbladStateOperator(coefficient='D_23*N_23', operator=j1))
 
 		# J_14 noise
 		j2 = self.Operator( 0.25*(tensor(Z,I,I,Z) + tensor(X,I,I,X) + tensor(Y,I,I,Y) - tensor(I,I,I,I)) ).restrict(3,5,6,9,10,12)

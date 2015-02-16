@@ -1,0 +1,21 @@
+This example models a single double-quantum-dot (DQD) qubit, as described in:
+Petta, J. R., et al. Coherent manipulation of coupled electron spins in semiconductor quantum dots. 
+Science (2005), 309(5744), 2180–4. doi:10.1126/science.1116955
+
+Usage
+-----
+
+On a system with python-qubricks and python-parameters installed, one can load the
+model in an interactive session using:
+-----
+$ ipython
+
+>>> from dqd import DQD
+>>> d = DQD('params.py')
+-----
+
+If you are interested in investigating how DC and HF charge noise affects
+singlet-return probabilities, run:
+-----
+$ python2 noise.py
+-----

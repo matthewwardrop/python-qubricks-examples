@@ -43,7 +43,7 @@ def singlet_return_with_dc_noise(**params):
 ### Plot singlet-return probability with only HF charge noise in the interaction picture
 def singlet_return_with_hf_noise(**params):
 	plt.figure()
-	print params
+	
 	operators = ['J_hf']
 	#operators.append('evolution') # UNCOMMENT THIS LINE TO LEAVE THE INTERACTION PICTURE
 

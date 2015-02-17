@@ -3,12 +3,12 @@ import numpy as np
 
 q = SimpleQuantumSystem(
   hamiltonian={
-    'B':[[1,0],[0,-1]],
-    'J':[[0,1],[1,0]]
+    'B_z':[[1,0],[0,-1]],
+    'B_x':[[0,1],[1,0]]
   },
   parameters={
-    'B':(40,'neV'),
-    'J':(40,'neV'),
+    'B_z':(40,'neV'),
+    'B_x':(40,'neV'),
     'T_2': (400,'ns'),
     'D': (lambda T_2,c_hbar: 0.5*c_hbar**2/T_2, '{mu}J^2*ns')
   },

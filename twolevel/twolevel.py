@@ -30,7 +30,7 @@ style = SampleStyle()
 
 with style:
 	# If B=0, plot theoretical exponential decay curve
-	if q.p.B == 0:
+	if q.p.B_z == 0:
 	    p_D = lambda t,D,c_hbar: np.exp(-2*D/c_hbar**2*t)
 	    plt.plot(ts*1e9,q.p.range(p_D,t=ts),linestyle='--')
 

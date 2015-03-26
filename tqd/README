@@ -1,0 +1,25 @@
+This example models a single triple-quantum-dot (TQD) qubit.
+
+Usage
+-----
+
+On a system with python-qubricks and python-parameters installed, one can load the
+model in an interactive session using:
+-----
+$ ipython2
+
+>>> from tqd import TQD
+>>> t = TQD('params.py')
+-----
+
+If you are interested in investigating how DC and HF charge noise affects
+return probabilities of various states, run:
+-----
+$ python2 noise.py
+-----
+
+If you would like to see the spectrum of the TQD system as 
+a function of detuning, run:
+-----
+$ python2 spectrum.py
+-----

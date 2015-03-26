@@ -1,22 +1,12 @@
-	#!/usr/bin/python2
-
-def start_pdb(signal, trace):
-    import pdb
-    pdb.set_trace()
-
-import signal
-signal.signal(signal.SIGQUIT, start_pdb)
-
 import sys,os,shelve
-sys.path.append('..')
-sys.path.append('/Storage/Education/University/PhD/libraries')
-sys.path.append('/Storage/PhD/libraries')
+
+sys.path.insert(0,"..")
 
 import numpy as np
 from scipy import stats
+
 from dqd import DQD
 from qubricks.analysis import ModelAnalysis
-
 
 res, profile = sys.argv[1:3]
 res = int(res)
@@ -27,7 +17,6 @@ operators.extend(sys.argv[3:])
 def path(name=''):
 	return os.path.join('fidelity_noise','%s-%s'%(profile,','.join(operators)),'%dx%d'%(res,res),name)
 
-
 class NoisyFidelity(ModelAnalysis):
 
 	def prepare(self):
@@ -36,17 +25,17 @@ class NoisyFidelity(ModelAnalysis):
 	def simulate(self):
 		ranges = [
 				{
-					'dB': ( (0.01,'mT'), (200,'mT'), res)
+					'D_B': ( (0.01,'mT'), (100,'mT'), res)
 				},
 				{
-					'J_1_avg': ( (0.01,'{mu}eV'), (0.7,'{mu}eV'), res)
+					'J_23_avg': ( (0.01,'{mu}eV'), (0.7,'{mu}eV'), res)
 				},
 				{
-					'de1': ( -3*self.system.p('e_deviation'), 3*self.system.p('e_deviation'), 21)
+					'de_23': ( -3*self.system.p('e_deviation'), 3*self.system.p('e_deviation'), 21)
 				}
 			]
 
-		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,times=['T'],subspace='logical',operators=operators,params={'J_2':0,'J_2_avg':0},nprocs=-1,yield_every=100)#,error_abs=1e-8,error_rel=1e-8)
+		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,times=['T'],subspace='logical',operators=operators,params={'J_14_avg':0})
 
 	def process(self,results=None):
 		ranges,ranges_eval,results = results.ranges, results.ranges_eval,results.results['entanglement_fidelity']
@@ -58,7 +47,7 @@ class NoisyFidelity(ModelAnalysis):
 							})
 					}) for i in xrange(2)]
 
-		des = self.system.p.range('de1',de1=ranges[2]['de1'])
+		des = self.system.p.range('de_23',de1=ranges[2]['de_23'])
 
 		Z = results['fidelity'][:,:,:,-1] # get results at time 'T' for all parameter values in ranges
 		L = results['leakage'][:,:,:,-1]

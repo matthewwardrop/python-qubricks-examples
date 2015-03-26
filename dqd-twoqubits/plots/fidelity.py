@@ -1,24 +1,19 @@
-#!/usr/bin/python2
-
 import sys,os,shelve
 
 sys.path.append('..')
 
+import numpy as np
+from qubricks.analysis import ModelAnalysis
 
 import matplotlib
 matplotlib.use('agg')
+import matplotlib.pyplot as plt
 from matplotlib import cm,colors
 from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
-from qubricks.utility import ModelAnalysis
-
 from mplstyles import SampleStyle
 from mplstyles.plots import contour_image
 
 from dqd import DQD
-
-
-import matplotlib.pyplot as plt
 
 res, profile = sys.argv[1:3]
 res = int(res)
@@ -41,21 +36,18 @@ class Fidelity(ModelAnalysis):
 	def simulate(self):
 		ranges = [
 			{
-				'dB': ( (0.01,'mT'), (200,'mT'), res)
+				'D_B': ( (0.01,'mT'), (100,'mT'), res)
 			},
-			#{
-			#	"D_1": ( (0.01*1.171e-05,'mV^2*ns'), (10*1.171e-05,'mV^2*ns'), 10 ),
-			#},
 			{
-				'J_1_avg': ( (0.01,'{mu}eV'), (0.7,'{mu}eV'), res)
+				'J_23_avg': ( (0.01,'{mu}eV'), (0.7,'{mu}eV'), res)
 			},
 		]
 
 		self.system.measure.entanglement_fidelity.multiprocessing = True
-		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,times=['T'],subspace='logical',operators=operators,params={'J_2':0,'J_2_avg':0},nprocs=-1,yield_every=100)#,error_abs=1e-9,error_rel=1e-9),'dB':(200,'mT')
+		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,times=['T'],subspace='logical',operators=operators,params={'J_14_avg':0})
 
 	def process(self,results=None):
-		ranges,ranges_eval,results = results
+		ranges,ranges_eval,results = results.ranges, results.ranges_eval, results.results['entanglement_fidelity']
 
 		##### Data preparation #############################################
 		X,Y = [
@@ -127,11 +119,11 @@ class Fidelity(ModelAnalysis):
 			ax.view_init(elev=45,azim=-45)
 
 			#np.where(Z>0.9,Z,np.nan)
-			ax.plot_surface(x,y,Z,rstride=1, cstride=1, cmap=cmap,
+			ax.plot_surface(x,y,Z.transpose(),rstride=1, cstride=1, cmap=cmap,
 			linewidth=0.0001, antialiased=False,vmin=0,vmax=1,edgecolor=(0,0,0,0))
-			ax.contour(x,y,Z+L,levels=np.linspace(0,1,20),offset=0)
-			plt.ylabel("$\Delta B$")
-			plt.xlabel("$J_{avg}$")
+			ax.contour(x,y,Z.transpose(),levels=np.linspace(0,1,20),offset=0)
+			plt.xlabel("$\Delta B$")
+			plt.ylabel("$J_{avg}$")
 			ax.set_zlabel("$\mathcal{F}$")
 			ax.set_zlim(0,1)
 			#style()

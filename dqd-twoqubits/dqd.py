@@ -8,17 +8,15 @@ from measurements import EntanglementFidelity
 class DQD (QuantumSystem):
 
 	# Required methods
-	def setup_environment(self,profile='sinusoidal',ansatz='exp',**kwargs):
+	def init(self,profile='sinusoidal',ansatz='exp',**kwargs):
 		self.__profile = profile
 		self.__ansatz = ansatz
 
-	def setup_parameters(self):
+	def init_parameters(self):
 		self.set_ansatz(self.__ansatz)
 		self.set_profile(self.__profile)
 
-		self.p.show()
-
-	def setup_states(self):
+	def init_states(self):
 		self.add_state('00', [0,0,0,0,1,0])
 		self.add_state('01', [0,0,0,1,0,0])
 		self.add_state('10', [0,0,1,0,0,0])
@@ -26,7 +24,7 @@ class DQD (QuantumSystem):
 
 		self.add_subspace('logical', [[0,1,0,0,0,0], [0,0,1,0,0,0], [0,0,0,1,0,0], [0,0,0,0,1,0]])
 
-	def setup_hamiltonian(self):
+	def init_hamiltonian(self):
 
 		I,X,Y,Z = np.array([[1,0],[0,1]]),np.array([[0,1],[1,0]]),np.array([[0,-1j],[1j,0]]),np.array([[1,0],[0,-1]])
 
@@ -43,7 +41,7 @@ class DQD (QuantumSystem):
 		return self.Operator(components).restrict(3,5,6,9,10,12).collapse()
 		# We have restricted by fiat to the m_z=0 subspace. Not necessary, except that it makes the symbolic matrices smaller
 
-	def setup_measurements(self):
+	def init_measurements(self):
 		self.add_measurement('leakage',Leakage())
 
 		# Add an entanglement_fidelity measure.
@@ -52,11 +50,7 @@ class DQD (QuantumSystem):
 		# Add an entanglement_fidelity measure when in the interaction picture
 		self.add_measurement('entanglement_fidelity_eye',EntanglementFidelity(ideal_ops=[IdentityOperator(self.p)]))
 
-	@property
-	def default_derivative_ops(self):
-		return ["evolution"]
-
-	def setup_derivative_ops(self):
+	def init_derivative_ops(self):
 		I,X,Y,Z = np.array([[1,0],[0,1]]),np.array([[0,1],[1,0]]),np.array([[0,-1j],[1j,0]]),np.array([[1,0],[0,-1]])
 
 		# J_23 noise
@@ -66,11 +60,6 @@ class DQD (QuantumSystem):
 		# J_14 noise
 		j2 = self.Operator( 0.25*(tensor(Z,I,I,Z) + tensor(X,I,I,X) + tensor(Y,I,I,Y) - tensor(I,I,I,I)) ).restrict(3,5,6,9,10,12)
 		self.add_derivative_op("J_14_hf", LindbladStateOperator(coefficient='D_14*N_14', operator=j2))
-
-	def setup_bases(self):
-		pass
-
-
 
 	# Ancillary helper functions
 	def set_ansatz(self,ansatz):

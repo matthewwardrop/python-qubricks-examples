@@ -9,9 +9,33 @@ class EntanglementFidelity(Measurement):
 	def init(self,ideal_ops=None,**kwargs):
 		self.__ideal_ops = ideal_ops
 
-	@property
-	def name(self):
-		return 'fidelity'
+	def measure(self,times,params={},operators=None,input=None,output=None,subspace=None,ideal_ops=None,**kwargs):
+		ideal_ops = self.__ideal_ops if ideal_ops is None else ideal_ops
+
+		if not isinstance(ideal_ops[0],StateOperator):
+			raise ValueError, "Ideal operator must be a StateOperator object."
+
+		use_ensemble = self.system.use_ensemble(operators)
+
+		y_0s = self.__get_y_0s(subspace,operators,input=input,output=output)
+		r = self.system.integrate(times,psi_0s=y_0s,input=input,output=output,operators=operators,params=params,**kwargs)
+
+		ideal_y_0 = np.sum(self.system.subspace(subspace,output=output),axis=0)
+		ideal_y_0 = ideal_y_0/np.linalg.norm(ideal_y_0)
+		r_bell = self.system.integrate(times,psi_0s=[ideal_y_0],input=input,output=output,operators=['evolution'],params=params,**kwargs)
+
+		for i in range(len(ideal_ops)):
+			ideal_ops[i] = ideal_ops[i].change_basis(output)
+
+		leakage_projector = self.system.subspace_projector(subspace, input=input, output=output, invert=True, params=params)
+
+		fidelities = [self.fidelity(times, r, r_bell, y_0s, ideal_op, leakage_projector, use_ensemble, params = params) for ideal_op in ideal_ops]
+
+		r = self.__max_fidelities(fidelities)
+
+		r = np.array([ (time,r['fidelity'][time],r['leakage'][time]) for time in sorted(r['fidelity']) ],dtype=self.result_type(times=times))
+
+		return r
 
 	def result_type(self,ranges=[],shape=None,params={},*args,**kwargs):
 		return [
@@ -22,39 +46,6 @@ class EntanglementFidelity(Measurement):
 
 	def result_shape(self,*args,**kwargs):
 		return (len(kwargs.get('times',0)),)
-
-	@property
-	def result_units(self):
-		return None
-
-	def measure(self,times,params={},operators=None,input=None,output=None,subspace=None,ideal_ops=None,**kwargs):
-		ideal_ops = self.__ideal_ops if ideal_ops is None else ideal_ops
-
-		if not isinstance(ideal_ops[0],StateOperator):
-			raise ValueError, "Ideal operator must be a StateOperator object."
-
-		use_ensemble = self._system.use_ensemble(operators)
-
-		y_0s = self.__get_y_0s(subspace,operators,input=input,output=output)
-		r = self._system.integrate(times,psi_0s=y_0s,input=input,output=output,operators=operators,params=params,**kwargs)
-
-		ideal_y_0 = np.sum(self._system.subspace(subspace,output=output),axis=0)
-		ideal_y_0 = ideal_y_0/np.linalg.norm(ideal_y_0)
-		r_bell = self._system.integrate(times,psi_0s=[ideal_y_0],input=input,output=output,operators=['evolution'],params=params,**kwargs)
-
-		for i in range(len(ideal_ops)):
-			ideal_ops[i] = ideal_ops[i].change_basis(output)
-
-		leakage_projector = self._system.subspace_projector(subspace, input=input, output=output, invert=True, params=params)
-
-		fidelities = [self.fidelity(times, r, r_bell, y_0s, ideal_op, leakage_projector, use_ensemble, params = params) for ideal_op in ideal_ops]
-
-		r = self.__max_fidelities(fidelities)
-
-		r = np.array([ (time,r['fidelity'][time],r['leakage'][time]) for time in sorted(r['fidelity']) ],dtype=self.result_type(times=times))
-
-		return r
-
 
 	def __max_fidelities(self,fidelities):
 		keys = sorted(fidelities[0]['fidelity'].keys())
@@ -72,30 +63,10 @@ class EntanglementFidelity(Measurement):
 				'fidelity': fidelity, 'leakage': leakage
 			}
 
-		#import pdb; pdb.set_trace()
 		return r
 
-	def __get_y_0s(self,subspace,operators,input=None,output=None):
-
-		use_ensemble = self._system.use_ensemble(operators)
-
-		y_0s = self._system.subspace(subspace,input=input,output=output)
-
-		if use_ensemble:
-			# If p_0s is None, create a self-entangled set of density operators
-			p_0s = []
-			for i in xrange(len(y_0s)):
-				i_state = y_0s[i]
-				for j in xrange(i, len(y_0s)):
-					j_state = y_0s[j]
-					p_0 = np.outer(i_state.conjugate(), j_state)
-					p_0s.append(p_0)
-			return p_0s
-
-		return y_0s
-
 	@property
-	def _integration_independent(self):
+	def is_independent(self):
 		return True
 
 	def fidelity(self, times, r, r_bell, y_0s, ideal_op, leakage_projector, use_ensemble, params = {}):
@@ -153,3 +124,22 @@ class EntanglementFidelity(Measurement):
 		#print fidelities
 
 		return {'fidelity': fidelities, 'leakage': leakages}
+
+	def __get_y_0s(self,subspace,operators,input=None,output=None):
+
+		use_ensemble = self.system.use_ensemble(operators)
+
+		y_0s = self.system.subspace(subspace,input=input,output=output)
+
+		if use_ensemble:
+			# If p_0s is None, create a self-entangled set of density operators
+			p_0s = []
+			for i in xrange(len(y_0s)):
+				i_state = y_0s[i]
+				for j in xrange(i, len(y_0s)):
+					j_state = y_0s[j]
+					p_0 = np.outer(i_state.conjugate(), j_state)
+					p_0s.append(p_0)
+			return p_0s
+
+		return y_0s

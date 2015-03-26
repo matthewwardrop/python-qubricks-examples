@@ -13,23 +13,14 @@ I,X,Y,Z = np.array([[1,0],[0,1]]),np.array([[0,1],[1,0]]),np.array([[0,-1j],[1j,
 
 class DQD (QuantumSystem):
 
-	def setup_environment(self,**kwargs):
-		pass
-
-	def setup_parameters(self):
-		# All parameters are configured in params.py. We just print them here.
-		self.p.show()
-
-	def setup_states(self):
+	def init_states(self):
 		self.add_state('ground', [0,0,1,0])
 		self.add_state('singlet', np.array([0,1,-1,0])/np.sqrt(2))
 		self.add_state('triplet', np.array([0,1,1,0])/np.sqrt(2))
 
 		self.add_subspace('logical',['singlet','triplet'])
 
-	def setup_hamiltonian(self):
-
-
+	def init_hamiltonian(self):
 		components = {
 			'B_1': tensor(Z,I),
 			'B_2': tensor(I,Z),
@@ -38,16 +29,8 @@ class DQD (QuantumSystem):
 
 		return self.Operator(components)
 
-	@property
-	def default_derivative_ops(self):
-		return ["evolution"]
-
-	def setup_derivative_ops(self):
-		pass
-
 	def get_derivative_ops(self,components=None):
 		return {
-
 		# High frequency noise in J
 		"J_hf": LindbladStateOperator(self.p,
 									coefficient='D*N',
@@ -55,8 +38,5 @@ class DQD (QuantumSystem):
 
 		}
 
-	def setup_measurements(self):
+	def init_measurements(self):
 		self.add_measurement('amplitude',AmplitudeMeasurement())
-
-	def setup_bases(self):
-		pass

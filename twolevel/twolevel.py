@@ -15,34 +15,31 @@ q = SimpleQuantumSystem(
   measurements={
     'E': ExpectationMeasurement( [[1,0],[0,-1]], [[0,1],[1,0]], [[0,-1j],[1j,0]] ),
   },
-  operators={
+  derivative_ops={
     'J_noise': LindbladStateOperator(coefficient='D',operator=[[0,1],[1,0]])
   }
 )
 
 ts = np.linspace(0,1e-6,1000)
+
 r = q.measure.E.integrate(psi_0s=[ [1,0] ],times=ts, operators=['evolution','J_noise'], int_progress=True)
 
 import matplotlib.pyplot as plt
-from mplstyles import SampleStyle
 
-style = SampleStyle()
+# If B=0, plot theoretical exponential decay curve
+if q.p.B_z == 0:
+    p_D = lambda t,D,c_hbar: np.exp(-2*D/c_hbar**2*t)
+    plt.plot(ts*1e9,q.p.range(p_D,t=ts),linestyle='--')
 
-with style:
-	# If B=0, plot theoretical exponential decay curve
-	if q.p.B_z == 0:
-	    p_D = lambda t,D,c_hbar: np.exp(-2*D/c_hbar**2*t)
-	    plt.plot(ts*1e9,q.p.range(p_D,t=ts),linestyle='--')
+plt.plot(r['time'][0]*1e9,r['expectation'][0,:,0],label="$\\left<Z\\right>$")
+plt.plot(r['time'][0]*1e9,r['expectation'][0,:,1],label="$\\left<X\\right>$")
+plt.plot(r['time'][0]*1e9,r['expectation'][0,:,2],label="$\\left<Y\\right>$")
 
-	plt.plot(r['time'][0]*1e9,r['expectation'][0,:,0],label="$\\left<Z\\right>$")
-	plt.plot(r['time'][0]*1e9,r['expectation'][0,:,1],label="$\\left<X\\right>$")
-	plt.plot(r['time'][0]*1e9,r['expectation'][0,:,2],label="$\\left<Y\\right>$")
+# Formatting options
+plt.grid()
+plt.legend(loc=0)
+plt.hlines([np.exp(-1),-np.exp(-1)],*plt.xlim())
+plt.xlabel('Time (ns)')
+plt.ylabel("$E_Z$")
 
-	# Formatting options
-	plt.grid()
-	plt.legend(loc=0)
-	plt.hlines([np.exp(-1),-np.exp(-1)],*plt.xlim())
-	plt.xlabel('Time (ns)')
-	plt.ylabel("$E_Z$")
-
-	style.savefig('results.pdf', polish=False, )
+plt.savefig('results.pdf')

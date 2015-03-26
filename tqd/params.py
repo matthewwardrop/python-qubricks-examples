@@ -15,7 +15,7 @@ dimension_scalings = {
 }
 
 units_custom = [
-	{"names":"tesla","abbr":"T","rel":g*mu_B,"dimensions":{"mass":1,"length":2,"time":-2}},
+	{"name":"tesla","abbr":"T","rel":g*mu_B,"dimensions":{"mass":1,"length":2,"time":-2}},
 ]
 
 parameters = {

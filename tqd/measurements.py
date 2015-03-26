@@ -21,16 +21,16 @@ class ProjectionProbabilities(Measurement):
 	def result_shape(self,*args,**kwargs):
 		return (len(kwargs['psi_0s']),len(kwargs.get('times',0)))
 
-	def measure(self,r,times=None,psi_0s=None,params={},subspace=None,states=[],**kwargs):
+	def measure(self,data,times=None,psi_0s=None,params={},subspace=None,states=[],**kwargs):
 
 		if len(states) == 0:
 			return ValueError("No states have been specified against which to project.")
-		states = [ self._system.state(state,input=kwargs.get("input"),output=kwargs.get("output"),threshold=kwargs.get("threshold"),params=params) for state in states ]
+		states = [ self.system.state(state,input=kwargs.get("input"),output=kwargs.get("output"),threshold=kwargs.get("threshold"),params=params) for state in states ]
 
-		rval = np.empty((len(r),len(times)),dtype=self.result_type(psi_0s=psi_0s,times=times,states=states))
+		rval = np.empty((len(data),len(times)),dtype=self.result_type(psi_0s=psi_0s,times=times,states=states))
 
 		self.__P = None
-		for i,resultset in enumerate(r):
+		for i,resultset in enumerate(data):
 			for j,time in enumerate(resultset['time']):
 				rval[i,j] = (time,self.projection(resultset['state'][j],states))
 
@@ -76,19 +76,19 @@ class EntanglementFidelity(Measurement):
 		if not isinstance(ideal_ops[0],StateOperator):
 			raise ValueError, "Ideal operator must be a StateOperator object."
 
-		use_ensemble = self._system.use_ensemble(operators)
+		use_ensemble = self.system.use_ensemble(operators)
 
 		y_0s = self.__get_y_0s(subspace,operators,input=input,output=output,threshold=threshold,params=params)
-		r = self._system.integrate(times,psi_0s=y_0s,input=output,output=output,threshold=threshold,operators=operators,params=params,**kwargs)
+		r = self.system.integrate(times,psi_0s=y_0s,input=output,output=output,threshold=threshold,operators=operators,params=params,**kwargs)
 
-		ideal_y_0 = np.sum(self._system.subspace(subspace,input=input,output=output,threshold=threshold,params=params),axis=0)
+		ideal_y_0 = np.sum(self.system.subspace(subspace,input=input,output=output,threshold=threshold,params=params),axis=0)
 		ideal_y_0 = ideal_y_0/np.linalg.norm(ideal_y_0)
-		r_bell = self._system.integrate(times,psi_0s=[ideal_y_0],input=output,output=output,threshold=threshold,operators=['evolution'],params=params,**kwargs)
+		r_bell = self.system.integrate(times,psi_0s=[ideal_y_0],input=output,output=output,threshold=threshold,operators=['evolution'],params=params,**kwargs)
 
 		for i in range(len(ideal_ops)):
-			ideal_ops[i] = ideal_ops[i].change_basis(self._system.basis(output),threshold=threshold)
+			ideal_ops[i] = ideal_ops[i].change_basis(self.system.basis(output),threshold=threshold)
 
-		leakage_projector = self._system.subspace_projector(subspace, input=input, output=output, threshold=threshold, invert=True, params=params)
+		leakage_projector = self.system.subspace_projector(subspace, input=input, output=output, threshold=threshold, invert=True, params=params)
 
 		fidelities = [self.fidelity(times, r, r_bell, y_0s, ideal_op, leakage_projector, use_ensemble, params = params) for ideal_op in ideal_ops]
 
@@ -120,9 +120,9 @@ class EntanglementFidelity(Measurement):
 
 	def __get_y_0s(self,subspace,operators,input=None,output=None,threshold=False,params={}):
 
-		use_ensemble = self._system.use_ensemble(operators)
+		use_ensemble = self.system.use_ensemble(operators)
 
-		y_0s = self._system.subspace(subspace,input=input,output=output,threshold=threshold,params=params)
+		y_0s = self.system.subspace(subspace,input=input,output=output,threshold=threshold,params=params)
 
 		if use_ensemble:
 			# If p_0s is None, create a self-entangled set of density operators

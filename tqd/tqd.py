@@ -17,17 +17,12 @@ I,X,Y,Z = np.array([[1,0],[0,1]]),np.array([[0,1],[1,0]]),np.array([[0,-1j],[1j,
 
 class TQD (QuantumSystem):
 
-	def setup_environment(self,**kwargs):
-		pass
-
-	def setup_parameters(self):
+	def init_parameters(self):
 		#self.set_noise()
 		subscripts = ['12','23']
 		for subscript in subscripts:
 			self.setup_noisy_exchange(subscript)
 		self.enable_noise(False,*subscripts)
-
-		self.p.show()
 
 	def enable_noise(self,enable,*subscripts):
 		for subscript in subscripts:
@@ -64,7 +59,7 @@ def N(J_{0},J_0,e_0):
 			'de_%s'%subscript: (0,'mV'),
 			}
 
-	def setup_states(self):
+	def init_states(self):
 		g = self.state_fromString
 
 		states = {
@@ -82,11 +77,11 @@ def N(J_{0},J_0,e_0):
 		for state in states:
 			self.add_state(state,states[state])
 
-	def setup_bases(self):
-		self.add_basis(SpinBasis(name="default",dim=self.dim,parameters=self.p))
-		self.add_basis(WorkingBasis(name="working",dim=self.dim,parameters=self.p,exact=False))
+	def init_bases(self):
+		self.add_basis("default", SpinBasis(dim=self.dim,parameters=self.p))
+		self.add_basis("working", WorkingBasis(dim=self.dim,parameters=self.p,exact=False))
 
-	def setup_hamiltonian(self):
+	def init_hamiltonian(self):
 		components = {
 			'coupling': self.Operator( {
 				"J_12/4": tensor(X,X,I) + tensor(Y,Y,I) + tensor(Z,Z,I) - tensor(I,I,I),
@@ -100,11 +95,7 @@ def N(J_{0},J_0,e_0):
 		}
 		return self.OperatorSet(components)
 
-	@property
-	def default_derivative_ops(self):
-		return ['evolution']
-
-	def setup_derivative_ops(self,components=None):
+	def get_derivative_ops(self,components=None):
 
 		def coupling(subscript,sites=3):
 			base = [I]*sites
@@ -119,14 +110,14 @@ def N(J_{0},J_0,e_0):
 		for subscript in ['12','23']:
 			self.add_derivative_op('J_%s_hf'%subscript, LindbladStateOperator(coefficient='D*N_%s'%subscript, operator=self.Operator(0.25*coupling(subscript))) )
 
-	def setup_measurements(self):
+	def init_measurements(self):
 		self.add_measurement('amplitude',AmplitudeMeasurement())
 		self.add_measurement('projection',ProjectionProbabilities())
 
 class WorkingBasis(Basis):
 
-	def init(self, name="", dim=None, parameters=None, exact=False, **kwargs):
-		if dim is None:
+	def init(self, exact=False):
+		if self.dim is None:
 			raise ValueError("Dimension of basis must be specified.")
 		self.exact = exact
 

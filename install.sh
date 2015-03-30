@@ -35,7 +35,7 @@ color=${2:-$black}           # Defaults to black, if not specified.
 #------------------------
 
 if [[ `uname` == 'Linux' ]]; then
-   echo "WARNING: On Linux systems, it is probably better to install the dependencies using your package manager. Continue? (y/N)" $red
+   cecho "WARNING: On Linux systems, it is probably better to install the dependencies using your package manager. Continue? (y/N)" $red
    read response
    if [[ $response != 'y' ]]; then
 	exit

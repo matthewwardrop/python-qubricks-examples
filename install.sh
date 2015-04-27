@@ -2,7 +2,7 @@
 cd `dirname $0`
 
 pip_modules="cython numpy scipy sympy matplotlib"
-git_modules="python-parameters python-qubricks python-mplstyles"
+git_modules="python-parampy python-qubricks python-mplstyles"
 
 black='\033[30;47m'
 red='\033[31;47m'

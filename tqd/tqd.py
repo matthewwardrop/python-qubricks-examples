@@ -5,7 +5,7 @@ import numpy as np
 import sympy
 import scipy.optimize as spo
 import scipy.linalg as spla
-from parameters import Parameters
+from parampy import Parameters
 
 from qubricks import QuantumSystem, StateOperator, Basis, Operator, OrthogonalOperator
 from qubricks.wall import LindbladStateOperator, SpinBasis, AmplitudeMeasurement

@@ -18,11 +18,11 @@ class EntanglementFidelity(Measurement):
 		use_ensemble = self.system.use_ensemble(operators)
 
 		y_0s = self.__get_y_0s(subspace,operators,input=input,output=output)
-		r = self.system.integrate(times,psi_0s=y_0s,input=input,output=output,operators=operators,params=params,**kwargs)
+		r = self.system.integrate(times,initial=y_0s,input=input,output=output,operators=operators,params=params,**kwargs)
 
 		ideal_y_0 = np.sum(self.system.subspace(subspace,output=output),axis=0)
 		ideal_y_0 = ideal_y_0/np.linalg.norm(ideal_y_0)
-		r_bell = self.system.integrate(times,psi_0s=[ideal_y_0],input=input,output=output,operators=['evolution'],params=params,**kwargs)
+		r_bell = self.system.integrate(times,initial=[ideal_y_0],input=input,output=output,operators=['evolution'],params=params,**kwargs)
 
 		for i in range(len(ideal_ops)):
 			ideal_ops[i] = ideal_ops[i].change_basis(output)

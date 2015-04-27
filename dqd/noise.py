@@ -20,7 +20,7 @@ def singlet_return_with_dc_noise(**params):
 
 	times = dqd.p.range('t',t=(0,'3*T_2s',1000),**params)
 	times2 = dqd.p.convert(times,output='ns')
-	results = dqd.measure.amplitude.iterate(ranges={'de':('-3*e_deviation','3*e_deviation',30)},times=times,psi_0s=['ground'],params=params,operators=operators)
+	results = dqd.measure.amplitude.iterate(ranges={'de':('-3*e_deviation','3*e_deviation',30)},times=times,initial=['ground'],params=params,operators=operators)
 	ranges,ranges_eval,r = results.ranges, results.ranges_eval, results.results['amplitude']
 	des = ranges_eval['de']
 	weights = stats.norm.pdf(des,loc=0,scale=dqd.p('e_deviation',**params))
@@ -43,7 +43,7 @@ def singlet_return_with_dc_noise(**params):
 ### Plot singlet-return probability with only HF charge noise in the interaction picture
 def singlet_return_with_hf_noise(**params):
 	plt.figure()
-	
+
 	operators = ['J_hf']
 	#operators.append('evolution') # UNCOMMENT THIS LINE TO LEAVE THE INTERACTION PICTURE
 

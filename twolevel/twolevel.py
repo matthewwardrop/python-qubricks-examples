@@ -22,7 +22,7 @@ q = SimpleQuantumSystem(
 
 ts = np.linspace(0,1e-6,1000)
 
-r = q.measure.E.integrate(psi_0s=[ [1,0] ],times=ts, operators=['evolution','J_noise'], int_progress=True)
+r = q.measure.E.integrate(initial=[ [1,0] ],times=ts, operators=['evolution','J_noise'], int_progress=True)
 
 import matplotlib.pyplot as plt
 

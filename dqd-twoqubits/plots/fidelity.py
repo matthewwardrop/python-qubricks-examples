@@ -43,8 +43,7 @@ class Fidelity(ModelAnalysis):
 			},
 		]
 
-		self.system.measure.entanglement_fidelity.multiprocessing = True
-		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,times=['T'],subspace='logical',operators=operators,params={'J_14_avg':0})
+		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,int_times=['T'],subspace='logical',int_operators=operators,params={'J_14_avg':0})
 
 	def process(self,results=None):
 		ranges,ranges_eval,results = results.ranges, results.ranges_eval, results.results['entanglement_fidelity']
@@ -93,7 +92,6 @@ class Fidelity(ModelAnalysis):
 			style.savefig(path('leakage_contour.pdf'))
 
 			plt.figure()
-			print Z-np.sqrt(1.-2.*L)
 			contour_image(X,Y,Z+L,cmap=cmap,contour_opts={'levels':[0.999,0.9991,0.9992,0.9993,0.9994,0.9995,0.9996,0.9997,0.9998,0.9999]},vmin=0,vmax=1,interpolation='nearest')
 			plt.ylabel("$J (\mu eV)$")
 			plt.xlabel("$\Delta B (mT)$")

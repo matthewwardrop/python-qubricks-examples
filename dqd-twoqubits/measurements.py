@@ -9,7 +9,12 @@ class EntanglementFidelity(Measurement):
 	def init(self,ideal_ops=None,**kwargs):
 		self.__ideal_ops = ideal_ops
 
-	def measure(self,times,params={},operators=None,input=None,output=None,subspace=None,ideal_ops=None,**kwargs):
+	def measure(self,params={},subspace=None,ideal_ops=None,int_kwargs={},**kwargs):
+		times = int_kwargs.get('times', [])
+		input = int_kwargs.get('input', None)
+		output = int_kwargs.get('output', None)
+		operators = int_kwargs.get('operators', [])
+
 		ideal_ops = self.__ideal_ops if ideal_ops is None else ideal_ops
 
 		if not isinstance(ideal_ops[0],StateOperator):
@@ -45,7 +50,7 @@ class EntanglementFidelity(Measurement):
 				]
 
 	def result_shape(self,*args,**kwargs):
-		return (len(kwargs.get('times',0)),)
+		return (len(kwargs.get('int_times',0)),)
 
 	def __max_fidelities(self,fidelities):
 		keys = sorted(fidelities[0]['fidelity'].keys())

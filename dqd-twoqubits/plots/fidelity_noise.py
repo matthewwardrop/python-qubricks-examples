@@ -35,7 +35,7 @@ class NoisyFidelity(ModelAnalysis):
 				}
 			]
 
-		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,times=['T'],subspace='logical',operators=operators,params={'J_14_avg':0})
+		return self.system.measure.entanglement_fidelity.iterate_to_file(path=path('data.shelf'),ranges=ranges,int_times=['T'],subspace='logical',int_operators=operators,params={'J_14_avg':0})
 
 	def process(self,results=None):
 		ranges,ranges_eval,results = results.ranges, results.ranges_eval,results.results['entanglement_fidelity']
@@ -59,11 +59,7 @@ class NoisyFidelity(ModelAnalysis):
 
 		Z = fidelities
 		L = leakages
-
-		# Investigate what plot looks like without pseudo-static noise
-		#Z = results.fidelity['T'][:,:,10]
-		#L = results.fidelity['T'][:,:,10]
-
+		
 		return {'X': X, 'Z':Z, 'L':L, 'Y':Y}
 
 	def plot(self,X,Y,Z,L):
@@ -119,16 +115,8 @@ class NoisyFidelity(ModelAnalysis):
 			plt.xlabel("$J_{avg}$")
 			ax.set_zlabel("$\mathcal{F}$")
 			ax.set_zlim(0,1)
-			#style()
 			style.savefig(path('fidelity_contour_3d.pdf'))
 
-		#print test.measure.leakage(['T'],y_0s=['ground'],subspace='logical',operators=['evolution'],params={'J_1_avg':0.15,'J_2_avg':0.15,'dB':-0.1})
-		#print test.measure.entanglement_fidelity(['T'],subspace='logical',operators=['evolution'],params={'J_1_avg':(0.1,'{mu}eV'),'J_2_avg':(0.1,'{mu}eV'),'dB':(30,'mT')},ideal_op=ideal_op)
-
-		#f3 = test.measure.leakage.iterate(ranges,params={'J_2_avg':0},y_0s=['ground'],times=['T'],subspace='logical',operators=['evolution'],error_abs=1e-16,error_rel=1e-16)
-		#print f3
-		#print f3.structure()
-		#f3 >> 'fidelity_new.hdf5'
 
 nf = NoisyFidelity()
 nf.plot()

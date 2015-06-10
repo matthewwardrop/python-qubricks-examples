@@ -204,6 +204,9 @@ class IdentityOperator(StateOperator):
 		raise NotImplementedError
 	def transform(self, transform_op):
 		raise NotImplementedError
+	@property
+	def is_linear(self):
+		return False
 
 class IdealOperator(StateOperator):
 	def __call__(self,t,y,y_b,params={}):
@@ -236,3 +239,6 @@ class IdealOperator(StateOperator):
 		raise NotImplementedError
 	def transform(self, transform_op):
 		raise NotImplementedError
+	@property
+	def is_linear(self):
+		return False

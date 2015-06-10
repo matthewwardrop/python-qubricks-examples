@@ -20,7 +20,7 @@ def singlet_return_with_dc_noise(**params):
 
 	times = dqd.p.range('t',t=(0,'3*T_2s',1000),**params)
 	times2 = dqd.p.convert(times,output='ns')
-	results = dqd.measure.amplitude.iterate(ranges={'de':('-3*e_deviation','3*e_deviation',30)},times=times,initial=['ground'],params=params,operators=operators)
+	results = dqd.measure.amplitude.iterate(ranges={'de':('-3*e_deviation','3*e_deviation',30)},int_times=times,int_initial=['ground'],params=params,int_operators=operators)
 	ranges,ranges_eval,r = results.ranges, results.ranges_eval, results.results['amplitude']
 	des = ranges_eval['de']
 	weights = stats.norm.pdf(des,loc=0,scale=dqd.p('e_deviation',**params))
@@ -49,7 +49,7 @@ def singlet_return_with_hf_noise(**params):
 
 	times = dqd.p.range('t',t=(0,'3*T_2',1000),**params)
 	times2 = dqd.p.convert(times,output='ns')
-	result = dqd.measure.amplitude.integrate(times,['ground'],operators=operators,params=params)
+	result = dqd.measure.amplitude.integrate(int_times=times,int_initial=['ground'],int_operators=operators,params=params)
 
 	for i in xrange(result.shape[0]):
 		for j in xrange(result['amplitude'].shape[-1]):
